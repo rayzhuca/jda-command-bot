@@ -106,7 +106,7 @@ public abstract class CommandGroup {
                     for (Command children : getParent().getChildren()) {
                         stringBuilder.append(children.getName() + ", ");
                     }
-                    builder.appendDescription(stringBuilder.substring(0, stringBuilder.length()-1));
+                    builder.appendDescription(stringBuilder.substring(0, stringBuilder.length()-2)+".");
                 }
             } else if (arguments.length == 0 && getParent() == null) { // Shows the help command's info itself
                 builder = getEmbedInfo();
