@@ -246,6 +246,13 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
+     * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an specified title and description.
+     */
+    public EmbedBuilder getEmbedSimpleError(String title, String description) {
+        return new EmbedBuilder().setTitle(title).setColor(BotConfiguration.getErrorColor()).setDescription(description);
+    }
+
+    /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
      *         the user that input have invalid syntax or parameters.
      * 
