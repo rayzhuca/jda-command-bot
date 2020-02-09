@@ -97,7 +97,7 @@ public abstract class CommandGroup {
             EmbedBuilder builder = null;
 
             if (arguments.length == 0 && getParent() != null) { // Shows a list of commands the command group has
-                builder = new EmbedBuilder().setTitle("Command Group: " + getParent().getName());
+                builder = new EmbedBuilder().setTitle("Command Group: " + getParent().getName()).setColor(BotConfiguration.getPromptColor());
 
                 if (getParent().getChildren().length == 0) {
                     builder.appendDescription("This command group contains no commands.");
