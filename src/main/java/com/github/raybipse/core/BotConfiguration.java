@@ -1,11 +1,19 @@
-package com.github.raybipse.components;
+package com.github.raybipse.core;
 
 import java.awt.Color;
 
+import com.github.raybipse.internal.ErrorMessages;
+
+import net.dv8tion.jda.api.JDA;
+
 /**
- * Configuration for the application. All properties in this method should be
- * used for the entire application. Methods and properties should be static by
- * default.
+ * BotConfiguration is responsible for configuring settings and variables of the
+ * bot.
+ * 
+ * The JDA object must be set via this class for
+ * {@link com.github.raybipse.components.Command Command}, or must pass the JDA
+ * object directly to {@link com.github.raybipse.components.Command Command}
+ * initalization.
  * 
  * @author RayBipse
  */
@@ -14,6 +22,26 @@ public class BotConfiguration {
     private static Color errorColor = new Color(237, 92, 90);
     private static Color successColor = new Color(93, 217, 107);
     private static Color promptColor = new Color(97, 189, 255);
+
+    private static JDA jda;
+
+    private BotConfiguration() {
+    }
+
+    /**
+     * @param jda is the {@link JDA} obj to be set
+     */
+    public static void setJDA(JDA jda) {
+        BotConfiguration.jda = jda;
+    }
+
+    /**
+     * @return the {@link JDA} set via {@link #setJDA}
+     */
+    public static JDA getJDA() {
+        ErrorMessages.requireNonNullReturn(jda, "getJDA");
+        return jda;
+    }
 
     public static String getBotPrefix() {
         return botPrefix;
