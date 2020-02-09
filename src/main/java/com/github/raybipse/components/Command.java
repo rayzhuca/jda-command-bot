@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import com.github.raybipse.core.BotConfiguration;
 import com.github.raybipse.internal.ErrorMessages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,16 +47,17 @@ import net.dv8tion.jda.api.utils.MarkdownUtil;
  */
 public abstract class Command extends ListenerAdapter {
 
-    private Set<Role> whitelistedRoles = new HashSet<>();
+    private Set<Role> requiredRoles = new HashSet<>();
     private Set<Role> blacklistedRoles = new HashSet<>();
-    private Consumer<MessageReceivedEvent> onFail = (a) -> {};
+    private Consumer<MessageReceivedEvent> onRolePermissionFail = (a) -> getEmbedPermissionError(requiredRoles,
+            blacklistedRoles);
 
     protected Command() {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
         ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
         ErrorMessages.requireNonNullReturn(getSyntax(), "getSyntax");
 
-        // App.getJDA().addEventListener(this);
+        BotConfiguration.getJDA().addEventListener(this);
     }
 
     /**
@@ -148,6 +151,7 @@ public abstract class Command extends ListenerAdapter {
      * @return true if message calls the command
      */
     protected boolean getInputValidity(String input) {
+        ErrorMessages.requireNonNullParam(input, "input");
         CommandGroup parent = getParent();
 
         if (parent == null) {
@@ -166,6 +170,7 @@ public abstract class Command extends ListenerAdapter {
      * @return a string without command group (if it exists) and command prefix
      */
     protected String trimInputBeginning(String input) {
+        ErrorMessages.requireNonNullParam(input, "input");
         CommandGroup parent = getParent();
         input = input.substring(BotConfiguration.getBotPrefix().length());
 
@@ -209,6 +214,7 @@ public abstract class Command extends ListenerAdapter {
      * @param input must be already trimed with {@link #trimInputBeginning()}
      */
     protected static String[] splitUserInput(String input) {
+        ErrorMessages.requireNonNullParam(input, "input");
         input = input.trim();
         ArrayList<String> output = new ArrayList<>();
         boolean inQuote = false;
@@ -235,6 +241,7 @@ public abstract class Command extends ListenerAdapter {
      * that does not have a blackslash behind it.
      */
     private static ArrayList<String> takeOutBackslashAndQuote(ArrayList<String> input) {
+        ErrorMessages.requireNonNullParam(input, "input");
         for (int i = 0; i < input.size(); i++) {
             char[] charArr = input.get(i).toCharArray();
             StringBuilder str = new StringBuilder();
@@ -251,21 +258,87 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * Calling this method would mean that all members that do not inherit the roles specified in the
-     * parameter ``roles`` could not acquire the permissions to call this method.
+     * Calling this method would mean users must have the roles supplied to this
+     * method to invoke the command.
      * 
-     * @param roles is the roles to whitelist
-     * @param onFail is called when the member does not acquire the specified role
+     * @param roles is the roles to require
      */
-    protected void whitelistRoles(Set<Role> roles, Consumer<MessageReceivedEvent> onFail) {
-        whitelistedRoles.addAll(roles);
+    protected void requireRoles(Set<Role> roles) {
+        requiredRoles.addAll(roles);
     }
 
     /**
-     * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an specified title and description.
+     * @return whitelisted roles
+     */
+    protected Set<Role> getRequiredRoles() {
+        return requiredRoles;
+    }
+
+    /**
+     * @param roles is the roles to blacklist
+     */
+    protected void blacklistRoles(Set<Role> roles) {
+        blacklistedRoles.addAll(roles);
+    }
+
+    /**
+     * @return blacklisted roles
+     */
+    protected Set<Role> getBlacklistedRoles() {
+        return blacklistedRoles;
+    }
+
+    /**
+     * 
+     * @param onRolePermissionFail is the lambda function to be called when a user
+     *                             does not have the permission to invoke the
+     *                             command
+     */
+    protected void setOnRolePermissionFail(Consumer<MessageReceivedEvent> onRolePermissionFail) {
+        ErrorMessages.requireNonNullParam(onRolePermissionFail, "onRolePermissionFail");
+        this.onRolePermissionFail = onRolePermissionFail;
+    }
+
+    /**
+     * @return the lambda function called when a user does not have the permission
+     *         to invoke the command
+     */
+    protected Consumer<MessageReceivedEvent> getOnRolePermissionFail() {
+        return onRolePermissionFail;
+    }
+
+    /**
+     * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an
+     *         specified title and description.
      */
     protected EmbedBuilder getEmbedSimpleError(String title, String description) {
-        return new EmbedBuilder().setTitle(title).setColor(BotConfiguration.getErrorColor()).setDescription(description);
+        return new EmbedBuilder().setTitle(title).setColor(BotConfiguration.getErrorColor())
+                .setDescription(description);
+    }
+
+    /**
+     * @param requiredRoles    is the roles needed to invoke the command
+     * @param blacklistedRoles is the roles blacklisted from invoking the command
+     * @return an embed message error that describes the roles needed or blacklisted
+     *         from invoking the command
+     */
+    protected EmbedBuilder getEmbedPermissionError(Set<Role> requiredRoles, Set<Role> blacklistedRoles) {
+        String description = "";
+        if (requiredRoles != null && !requiredRoles.isEmpty()) {
+            description += "The role" + (requiredRoles.size() == 1 ? "" : "s") + ": "
+                    + String.join(", ", requiredRoles.stream().map(role -> role.getName()).collect(Collectors.toSet()))
+                    + " is required to invoke the command.";
+        }
+        if (blacklistedRoles != null && blacklistedRoles.isEmpty()) {
+            description += "The role" + (requiredRoles.size() == 1 ? "" : "s") + ": "
+                    + String.join(", ",
+                            blacklistedRoles.stream().map(role -> role.getName()).collect(Collectors.toSet()))
+                    + " is blacklisted from invoking the command.";
+        }
+        if (description.isBlank()) {
+            description = "Unidentified permission error.";
+        }
+        return getEmbedSimpleError("Role Permission Error", description);
     }
 
     /**
@@ -279,6 +352,7 @@ public abstract class Command extends ListenerAdapter {
      * @see #getEmbedInvalidParameterTypes()
      */
     protected EmbedBuilder getEmbedInvalidParameterError(String errorName) {
+        ErrorMessages.requireNonNullParam(errorName, "errorName");
         EmbedBuilder builder = new EmbedBuilder().setTitle(errorName).setColor(BotConfiguration.getErrorColor());
 
         if (getParent() != null)
