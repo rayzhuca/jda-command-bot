@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 
@@ -51,8 +52,10 @@ public abstract class Command extends ListenerAdapter {
 
     private Set<Role> requiredRoles = new HashSet<>();
     private Set<Role> blacklistedRoles = new HashSet<>();
-    private Consumer<MessageReceivedEvent> onRolePermissionFail = (a) -> getEmbedPermissionError(requiredRoles,
-            blacklistedRoles);
+    private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> {
+            event.getChannel().sendMessage(getEmbedPermissionError(requiredRoles, blacklistedRoles).build()).queue();
+            System.out.println("queued");
+    };
 
     protected Command() {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
@@ -307,14 +310,17 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * Checks if user have the role permission to invoke the command. If not, run
-     * the return result of {@link #getOnRolePermissionFail()}.
+     * Runs the returned consumer of {@link #getOnRolePermissionFail()} and throws
+     * an exception if the user does not met expected permissions.
      * 
-     * @param event is the message event
+     * @param event is the event of the message
+     * 
+     * @throws PermissionException if the user does not met expected permissions
      */
     protected void enforceUserRolePermission(MessageReceivedEvent event) {
         if (!checkUserRolePermission(event.getMember())) {
             getOnRolePermissionFail().accept(event);
+            throw new PermissionException("Member does not meet requirements to invoke the command.");
         }
     }
 
@@ -355,14 +361,17 @@ public abstract class Command extends ListenerAdapter {
     protected EmbedBuilder getEmbedPermissionError(Set<Role> requiredRoles, Set<Role> blacklistedRoles) {
         String description = "";
         if (requiredRoles != null && !requiredRoles.isEmpty()) {
-            description += "The role" + (requiredRoles.size() == 1 ? "" : "s") + ": "
-                    + String.join(", ", requiredRoles.stream().map(role -> role.getName()).collect(Collectors.toSet()))
-                    + " is required to invoke the command.";
+            description += "The role"
+                    + (requiredRoles.size() == 1 ? "" : "s") + ": " + String.join(", ", requiredRoles.stream()
+                            .map(role -> MarkdownUtil.monospace(role.getName())).collect(Collectors.toSet()))
+                    + " is required to invoke the command. ";
         }
-        if (blacklistedRoles != null && blacklistedRoles.isEmpty()) {
-            description += "The role" + (requiredRoles.size() == 1 ? "" : "s") + ": "
-                    + String.join(", ",
-                            blacklistedRoles.stream().map(role -> role.getName()).collect(Collectors.toSet()))
+        if (blacklistedRoles != null && !blacklistedRoles.isEmpty()) {
+            description += "The role"
+                    + (requiredRoles.size() == 1 ? "" : "s") + ": " + String
+                            .join(", ",
+                                    blacklistedRoles.stream().map(role -> MarkdownUtil.monospace(role.getName()))
+                                            .collect(Collectors.toSet()))
                     + " is blacklisted from invoking the command.";
         }
         if (description.isBlank()) {
