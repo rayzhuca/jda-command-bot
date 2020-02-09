@@ -2,6 +2,7 @@ package com.github.raybipse.components;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import com.github.raybipse.core.BotConfiguration;
 import com.github.raybipse.internal.ErrorMessages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -286,6 +288,34 @@ public abstract class Command extends ListenerAdapter {
      */
     protected Set<Role> getBlacklistedRoles() {
         return blacklistedRoles;
+    }
+
+    /**
+     * 
+     * @param member is the user to be checked on
+     * @return true if {@code member} contains all required roles and does not
+     *         contain any blacklisted roles
+     */
+    protected boolean checkUserRolePermission(Member member) {
+        List<Role> userRoles = member.getRoles();
+        for (Role role : getBlacklistedRoles()) {
+            if (userRoles.contains(role)) {
+                return false;
+            }
+        }
+        return userRoles.containsAll(getRequiredRoles());
+    }
+
+    /**
+     * Checks if user have the role permission to invoke the command. If not, run
+     * the return result of {@link #getOnRolePermissionFail()}.
+     * 
+     * @param event is the message event
+     */
+    protected void enforceUserRolePermission(MessageReceivedEvent event) {
+        if (!checkUserRolePermission(event.getMember())) {
+            getOnRolePermissionFail().accept(event);
+        }
     }
 
     /**
