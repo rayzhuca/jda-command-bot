@@ -55,17 +55,17 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @return the name of the command. The name cannot be null.
      */
-    public abstract String getName();
+    protected abstract String getName();
 
     /**
      * @return the prefix used to invoke the command. The prefix cannot be null.
      */
-    public abstract String getPrefix();
+    protected abstract String getPrefix();
 
     /**
      * @return the description of the command. Return null if there is none.
      */
-    public abstract String getDescription();
+    protected abstract String getDescription();
 
     /**
      * @return an array of examples showcasing how to use the command. The array can
@@ -77,7 +77,7 @@ public abstract class Command extends ListenerAdapter {
      *          "[parameters...]" would become "[bot prefix][command group prefix]
      *          [prefix] [parameters...]".
      */
-    public abstract String[] getExamples();
+    protected abstract String[] getExamples();
 
     /**
      * @return the syntax of the command. The syntax cannot be null.
@@ -88,13 +88,13 @@ public abstract class Command extends ListenerAdapter {
      *          "[parameters...]" would become "[bot prefix][command group prefix]
      *          [prefix] [parameters...]".
      */
-    public abstract String getSyntax();
+    protected abstract String getSyntax();
 
     /**
      * @return the parent command group of the command. Return null if there is
      *         none.
      */
-    public abstract CommandGroup getParent();
+    protected abstract CommandGroup getParent();
 
     /**
      * @return information of the command
@@ -103,7 +103,7 @@ public abstract class Command extends ListenerAdapter {
      *          this method and return null if you wish to not show information
      *          about this command.
      */
-    public EmbedBuilder getEmbedInfo() {
+    protected EmbedBuilder getEmbedInfo() {
         EmbedBuilder builder = new EmbedBuilder().setTitle("Command: \"" + getName() + "\"")
                 .setColor(BotConfiguration.getPromptColor());
         if (getDescription() != null) {
@@ -142,7 +142,7 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @return true if message calls the command
      */
-    public boolean getInputValidity(String input) {
+    protected boolean getInputValidity(String input) {
         CommandGroup parent = getParent();
 
         if (parent == null) {
@@ -160,7 +160,7 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @return a string without command group (if it exists) and command prefix
      */
-    public String trimInputBeginning(String input) {
+    protected String trimInputBeginning(String input) {
         CommandGroup parent = getParent();
         input = input.substring(BotConfiguration.getBotPrefix().length());
 
@@ -203,7 +203,7 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @param input must be already trimed with {@link #trimInputBeginning()}
      */
-    public static String[] splitUserInput(String input) {
+    protected static String[] splitUserInput(String input) {
         input = input.trim();
         ArrayList<String> output = new ArrayList<>();
         boolean inQuote = false;
@@ -248,7 +248,7 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an specified title and description.
      */
-    public EmbedBuilder getEmbedSimpleError(String title, String description) {
+    protected EmbedBuilder getEmbedSimpleError(String title, String description) {
         return new EmbedBuilder().setTitle(title).setColor(BotConfiguration.getErrorColor()).setDescription(description);
     }
 
@@ -262,7 +262,7 @@ public abstract class Command extends ListenerAdapter {
      * @see #getEmbedMissingArguments()
      * @see #getEmbedInvalidParameterTypes()
      */
-    public EmbedBuilder getEmbedInvalidParameterError(String errorName) {
+    protected EmbedBuilder getEmbedInvalidParameterError(String errorName) {
         EmbedBuilder builder = new EmbedBuilder().setTitle(errorName).setColor(BotConfiguration.getErrorColor());
 
         if (getParent() != null)
@@ -291,7 +291,7 @@ public abstract class Command extends ListenerAdapter {
      *          {@link #getEmbedInvalidParameterError(String)} with "Missing
      *          Argument(s) Error" as the errorName parameter
      */
-    public EmbedBuilder getEmbedMissingArguments() {
+    protected EmbedBuilder getEmbedMissingArguments() {
         return getEmbedInvalidParameterError("Missing Argument(s) Error");
     }
 
@@ -303,7 +303,7 @@ public abstract class Command extends ListenerAdapter {
      *          {@link #getEmbedInvalidParameterError(String)} with "Invalid
      *          Parameter Type(s)" as the errorName parameter
      */
-    public EmbedBuilder getEmbedInvalidParameterTypes() {
+    protected EmbedBuilder getEmbedInvalidParameterTypes() {
         return getEmbedInvalidParameterError("Invalid Parameter Type(s)");
     }
 }
