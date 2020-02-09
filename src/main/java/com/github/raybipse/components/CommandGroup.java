@@ -1,5 +1,6 @@
 package com.github.raybipse.components;
 
+import com.github.raybipse.core.BotConfiguration;
 import com.github.raybipse.internal.ErrorMessages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,8 +35,8 @@ public abstract class CommandGroup {
     public abstract String getDescription();
 
     /**
-     * @return an array of commands the group directly inherits. Return an empty array is there is none.
-     * Do not return null.
+     * @return an array of commands the group directly inherits. Return an empty
+     *         array is there is none. Do not return null.
      */
     public abstract Command[] getChildren();
 
@@ -45,7 +46,8 @@ public abstract class CommandGroup {
     public abstract String getPrefix();
 
     /**
-     * A command that gives information about for the {@link CommandGroup} and its children.
+     * A command that gives information about for the {@link CommandGroup} and its
+     * children.
      * 
      * @author RayBipse
      */
@@ -100,29 +102,30 @@ public abstract class CommandGroup {
                 if (getParent().getChildren().length == 0) {
                     builder.appendDescription("This command group contains no commands.");
                 } else {
-                    StringBuilder stringBuilder = new StringBuilder("This command group contains the following commands: ");
+                    StringBuilder stringBuilder = new StringBuilder(
+                            "This command group contains the following commands: ");
                     for (Command children : getParent().getChildren()) {
                         stringBuilder.append(children.getName() + ", ");
                     }
-                    builder.appendDescription(stringBuilder.substring(0, stringBuilder.length()-2)+".");
+                    builder.appendDescription(stringBuilder.substring(0, stringBuilder.length() - 2) + ".");
                 }
             } else if (arguments.length == 0 && getParent() == null) { // Shows the help command's info itself
                 builder = getEmbedInfo();
-            } else { // Shows the command of the command group's children that the first arg specified
+            } else { // Shows the command of the command group's children that the first arg
+                     // specified
                 for (Command children : getParent().getChildren()) {
                     if (children.getName().equalsIgnoreCase(arguments[0])) {
                         builder = children.getEmbedInfo();
                         if (builder == null) {
                             builder = new EmbedBuilder()
-                                .setDescription("Information about command \"" + arguments[0] + "\" is hidden.")
-                                .setColor(BotConfiguration.getErrorColor());
+                                    .setDescription("Information about command \"" + arguments[0] + "\" is hidden.")
+                                    .setColor(BotConfiguration.getErrorColor());
                         }
                     }
                 }
                 if (builder == null) {
-                    builder = new EmbedBuilder()
-                        .setDescription("Command \"" + arguments[0] + "\" not found.")
-                        .setColor(BotConfiguration.getErrorColor());
+                    builder = new EmbedBuilder().setDescription("Command \"" + arguments[0] + "\" not found.")
+                            .setColor(BotConfiguration.getErrorColor());
                 }
             }
 
