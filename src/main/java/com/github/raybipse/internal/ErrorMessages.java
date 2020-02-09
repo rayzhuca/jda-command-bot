@@ -1,5 +1,6 @@
 package com.github.raybipse.internal;
 
+import java.security.InvalidParameterException;
 import java.util.Objects;
 
 /**
@@ -23,7 +24,10 @@ public class ErrorMessages {
      * @return {@code obj}
      */
     public static <T> T requireNonNullParam(T obj, String paramName) {
-        return Objects.requireNonNull(obj, "Parameter \"" + paramName + "\" should not be null.");
+        if (obj != null) {
+            return obj;
+        }
+        throw new InvalidParameterException("Parameter \"" + paramName + "\" should not be null.");
     }
 
     /**
