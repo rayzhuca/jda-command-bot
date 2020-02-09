@@ -52,10 +52,8 @@ public abstract class Command extends ListenerAdapter {
 
     private Set<Role> requiredRoles = new HashSet<>();
     private Set<Role> blacklistedRoles = new HashSet<>();
-    private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> {
+    private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> 
             event.getChannel().sendMessage(getEmbedPermissionError(requiredRoles, blacklistedRoles).build()).queue();
-            System.out.println("queued");
-    };
 
     protected Command() {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
