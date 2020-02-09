@@ -1,4 +1,4 @@
-package com.github.raybipse.framework;
+package com.github.raybipse.components;
 
 import java.awt.Color;
 

@@ -1,7 +1,7 @@
 package com.github.raybipse.commands.test;
 
-import com.github.raybipse.framework.Command;
-import com.github.raybipse.framework.CommandGroup;
+import com.github.raybipse.components.Command;
+import com.github.raybipse.components.CommandGroup;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 

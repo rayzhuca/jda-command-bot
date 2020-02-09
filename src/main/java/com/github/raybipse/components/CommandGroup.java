@@ -1,4 +1,4 @@
-package com.github.raybipse.framework;
+package com.github.raybipse.components;
 
 import com.github.raybipse.internal.ErrorMessages;
 

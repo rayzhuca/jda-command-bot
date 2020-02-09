@@ -1,4 +1,4 @@
-package com.github.raybipse.framework;
+package com.github.raybipse.components;
 
 import java.util.ArrayList;
 import java.util.HashSet;
