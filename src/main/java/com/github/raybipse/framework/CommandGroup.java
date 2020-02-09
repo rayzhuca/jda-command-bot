@@ -1,5 +1,7 @@
 package com.github.raybipse.framework;
 
+import com.github.raybipse.internal.ErrorMessages;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -16,13 +18,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public abstract class CommandGroup {
 
     protected CommandGroup() {
-        // Check for null values
-        if (getName() == null)
-            throw new InvalidReturnTypeException("\"getName()\" cannot return null.");
-        if (getPrefix() == null)
-            throw new InvalidReturnTypeException("\"getPrefix()\" cannot return null.");
-        if (getChildren() == null)
-            throw new InvalidReturnTypeException("\"getChildren()\" cannot return null.");
+        ErrorMessages.requireNonNullReturn(getName(), "getName");
+        ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
+        ErrorMessages.requireNonNullReturn(getChildren(), "getChildren");
     }
 
     /**

@@ -1,10 +1,15 @@
 package com.github.raybipse.framework;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
 
-import com.github.raybipse.App;
+import com.github.raybipse.internal.ErrorMessages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 
@@ -40,16 +45,16 @@ import net.dv8tion.jda.api.utils.MarkdownUtil;
  */
 public abstract class Command extends ListenerAdapter {
 
-    protected Command() {
-        // Check for null values
-        if (getName() == null)
-            throw new InvalidReturnTypeException("\"getName()\" cannot return null.");
-        if (getPrefix() == null)
-            throw new InvalidReturnTypeException("\"getPrefix()\" cannot return null.");
-        if (getSyntax() == null)
-            throw new InvalidReturnTypeException("\"getSyntax()\" cannot return null.");
+    private Set<Role> whitelistedRoles = new HashSet<>();
+    private Set<Role> blacklistedRoles = new HashSet<>();
+    private Consumer<MessageReceivedEvent> onFail = (a) -> {};
 
-        App.getJDA().addEventListener(this);
+    protected Command() {
+        ErrorMessages.requireNonNullReturn(getName(), "getName");
+        ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
+        ErrorMessages.requireNonNullReturn(getSyntax(), "getSyntax");
+
+        // App.getJDA().addEventListener(this);
     }
 
     /**
@@ -243,6 +248,17 @@ public abstract class Command extends ListenerAdapter {
         }
 
         return input;
+    }
+
+    /**
+     * Calling this method would mean that all members that do not inherit the roles specified in the
+     * parameter ``roles`` could not acquire the permissions to call this method.
+     * 
+     * @param roles is the roles to whitelist
+     * @param onFail is called when the member does not acquire the specified role
+     */
+    protected void whitelistRoles(Set<Role> roles, Consumer<MessageReceivedEvent> onFail) {
+        whitelistedRoles.addAll(roles);
     }
 
     /**
