@@ -10,6 +10,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub RayBipse Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/RayBipse/jda-command-bot</url>
+        </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>jcenter</id>
