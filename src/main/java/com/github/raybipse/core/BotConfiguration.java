@@ -29,6 +29,10 @@ public class BotConfiguration {
     }
 
     /**
+     * This JDA object is used for {@link com.github.raybipse.components.Command
+     * Command} to register themselves as an
+     * {@link net.dv8tion.jda.api.hooks.ListenerAdapter ListenerAdapter}.
+     * 
      * @param jda is the {@link JDA} obj to be set
      */
     public static void setJDA(JDA jda) {
@@ -36,6 +40,10 @@ public class BotConfiguration {
     }
 
     /**
+     * This JDA object is used for {@link com.github.raybipse.components.Command
+     * Command} to register themselves as an
+     * {@link net.dv8tion.jda.api.hooks.ListenerAdapter ListenerAdapter}.
+     * 
      * @return the {@link JDA} set via {@link #setJDA}
      */
     public static JDA getJDA() {
@@ -43,10 +51,22 @@ public class BotConfiguration {
         return jda;
     }
 
+    /**
+     * If the bot prefix is "/", then a command may be invoked by a user typing:
+     * [box prefix][command group prefix] [command prefix]
+     * 
+     * @return the box prefix
+     */
     public static String getBotPrefix() {
         return botPrefix;
     }
 
+    /**
+     * If the bot prefix is "/", then a command may be invoked by a user typing:
+     * [box prefix][command group prefix] [command prefix]
+     * 
+     * @param botPrefix is the bot's prefix used to invoke to bot
+     */
     public static void setBotPrefix(String botPrefix) {
         if (botPrefix == null) {
             throw new IllegalArgumentException("\"botPrefix\" cannot be null.");
@@ -54,10 +74,22 @@ public class BotConfiguration {
         BotConfiguration.botPrefix = botPrefix;
     }
 
+    /**
+     * Success color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * @return the success color
+     */
     public static Color getSuccessColor() {
         return successColor;
     }
 
+    /**
+     * Success color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * @param successColor is the success color to be set
+     */
     public static void setSuccessColor(Color successColor) {
         if (successColor == null) {
             throw new IllegalArgumentException("\"successColor\" cannot be null.");
@@ -65,10 +97,22 @@ public class BotConfiguration {
         BotConfiguration.successColor = successColor;
     }
 
+    /**
+     * Error color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * @return the error color
+     */
     public static Color getErrorColor() {
         return errorColor;
     }
 
+    /**
+     * Error color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * @param errorColor is the error color to be set
+     */
     public static void setErrorColor(Color errorColor) {
         if (errorColor == null) {
             throw new IllegalArgumentException("\"errorColor\" cannot be null.");
@@ -77,16 +121,26 @@ public class BotConfiguration {
     }
 
     /**
-     * @apiNote prmopt color is also used for the
-     *          {@link com.github.raybipse.framework.CommandGroup.Help Help} command
+     * Prompt color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * Prompt color is also used for the
+     * {@link com.github.raybipse.components.CommandGroup.Help Help} command
+     * 
+     * @return the prompt color
      */
     public static Color getPromptColor() {
         return promptColor;
     }
 
     /**
-     * @apiNote prmopt color is also used for the
-     *          {@link com.github.raybipse.framework.CommandGroup.Help Help} command
+     * Prompt color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
+     * EmbedBuilder} made by default commands.
+     * 
+     * Prompt color is also used for the
+     * {@link com.github.raybipse.components.CommandGroup.Help Help} command
+     * 
+     * @param promptColor is the prompt color to be set
      */
     public static void setPromptColor(Color promptColor) {
         if (promptColor == null) {

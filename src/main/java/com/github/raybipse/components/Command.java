@@ -45,7 +45,6 @@ import net.dv8tion.jda.api.utils.MarkdownUtil;
  * This must be implemented in the command itself since abstract classes cannot
  * implement this behavior easily.
  * 
- * @see {@link CommandGroup}
  * @author RayBipse
  */
 public abstract class Command extends ListenerAdapter {
@@ -80,9 +79,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * @return an array of examples showcasing how to use the command. The array can
-     *         be empty or null.
-     * 
-     * @apiNote the return value should only contain the example concerned after the
+     *         be empty or null. The return value should only contain the example concerned after the
      *          prefix(es). The bot prefix, {@link CommandGroup} prefix, and command
      *          prefix will automatically be added. E.g., a return value of
      *          "[parameters...]" would become "[bot prefix][command group prefix]
@@ -91,9 +88,9 @@ public abstract class Command extends ListenerAdapter {
     protected abstract String[] getExamples();
 
     /**
-     * @return the syntax of the command. The syntax cannot be null.
      * 
-     * @apiNote the return value should only contain the syntax concerned after the
+     * 
+     * @return the syntax of the command. The syntax cannot be null. The return value should only contain the syntax concerned after the
      *          prefix(es). The bot prefix, {@link CommandGroup} prefix, and command
      *          prefix will automatically be added. E.g., a return value of
      *          "[parameters...]" would become "[bot prefix][command group prefix]
@@ -108,11 +105,11 @@ public abstract class Command extends ListenerAdapter {
     protected abstract CommandGroup getParent();
 
     /**
-     * @return information of the command
-     * 
-     * @apiNote this method is used by the parent's default help command. Override
+     * This method is used by the parent's default help command. Override
      *          this method and return null if you wish to not show information
      *          about this command.
+     * 
+     * @return information of the command
      */
     protected EmbedBuilder getEmbedInfo() {
         EmbedBuilder builder = new EmbedBuilder().setTitle("Command: \"" + getName() + "\"")
@@ -151,7 +148,9 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @return true if message calls the command
+     * @param input the input to be checked
+     * 
+     * @return true if message invokes the command
      */
     protected boolean getInputValidity(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
@@ -168,7 +167,7 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @param input is the original content of the message sent by the user. Input
      *              must of been already checked for validity with
-     *              {@link #getInputValidity()}
+     *              {@link #getInputValidity(String)}
      * 
      * @return a string without command group (if it exists) and command prefix
      */
@@ -214,7 +213,8 @@ public abstract class Command extends ListenerAdapter {
      * </code>
      * </pre>
      * 
-     * @param input must be already trimed with {@link #trimInputBeginning()}
+     * @param input must be already trimed with {@link #trimInputBeginning(String)}
+     * @return an array of separated arguments
      */
     protected static String[] splitUserInput(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
@@ -242,6 +242,9 @@ public abstract class Command extends ListenerAdapter {
     /**
      * Removes backslashes that is behind a quotation mark. Removes quotation marks
      * that does not have a blackslash behind it.
+     * 
+     * @param input the input to be evaluated
+     * @return the {@code input} without the specified blackslashs and quotes
      */
     private static ArrayList<String> takeOutBackslashAndQuote(ArrayList<String> input) {
         ErrorMessages.requireNonNullParam(input, "input");
@@ -342,6 +345,9 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
+     * @param title is the title of the embed message
+     * @param description is the description of the embed message
+     * 
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an
      *         specified title and description.
      */
@@ -353,6 +359,7 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @param requiredRoles    is the roles needed to invoke the command
      * @param blacklistedRoles is the roles blacklisted from invoking the command
+     * 
      * @return an embed message error that describes the roles needed or blacklisted
      *         from invoking the command
      */
@@ -379,11 +386,10 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
+     * @param errorName is the title of the embed message
+     * 
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
      *         the user that input have invalid syntax or parameters.
-     * 
-     * @apiNote it is recommended to use the default methods that those cases, such
-     *          as {@link #getEmbedMissingArguments()}
      * 
      * @see #getEmbedMissingArguments()
      * @see #getEmbedInvalidParameterTypes()
@@ -412,9 +418,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
-     *         the user that input have missing arguments
-     * 
-     * @apiNote this is the equivalent of the return value of
+     *         the user that input have missing arguments. This is the equivalent of the return value of
      *          {@link #getEmbedInvalidParameterError(String)} with "Missing
      *          Argument(s) Error" as the errorName parameter
      */
@@ -424,9 +428,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
-     *         the user that input have invalid parameter types
-     * 
-     * @apiNote this is the equivalent of the return value of
+     *         the user that input have invalid parameter types. This is the equivalent of the return value of
      *          {@link #getEmbedInvalidParameterError(String)} with "Invalid
      *          Parameter Type(s)" as the errorName parameter
      */
