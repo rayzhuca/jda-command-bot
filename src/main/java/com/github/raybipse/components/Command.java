@@ -54,7 +54,7 @@ public abstract class Command extends ListenerAdapter {
     private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> 
             event.getChannel().sendMessage(getEmbedPermissionError(requiredRoles, blacklistedRoles).build()).queue();
 
-    protected Command() {
+    public Command() {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
         ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
         ErrorMessages.requireNonNullReturn(getSyntax(), "getSyntax");
@@ -65,17 +65,17 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @return the name of the command. The name cannot be null.
      */
-    protected abstract String getName();
+    public abstract String getName();
 
     /**
      * @return the prefix used to invoke the command. The prefix cannot be null.
      */
-    protected abstract String getPrefix();
+    public abstract String getPrefix();
 
     /**
      * @return the description of the command. Return null if there is none.
      */
-    protected abstract String getDescription();
+    public abstract String getDescription();
 
     /**
      * @return an array of examples showcasing how to use the command. The array can
@@ -85,7 +85,7 @@ public abstract class Command extends ListenerAdapter {
      *          "[parameters...]" would become "[bot prefix][command group prefix]
      *          [prefix] [parameters...]".
      */
-    protected abstract String[] getExamples();
+    public abstract String[] getExamples();
 
     /**
      * 
@@ -96,13 +96,13 @@ public abstract class Command extends ListenerAdapter {
      *          "[parameters...]" would become "[bot prefix][command group prefix]
      *          [prefix] [parameters...]".
      */
-    protected abstract String getSyntax();
+    public abstract String getSyntax();
 
     /**
      * @return the parent command group of the command. Return null if there is
      *         none.
      */
-    protected abstract CommandGroup getParent();
+    public abstract CommandGroup getParent();
 
     /**
      * This method is used by the parent's default help command. Override
@@ -111,7 +111,7 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @return information of the command
      */
-    protected EmbedBuilder getEmbedInfo() {
+    public EmbedBuilder getEmbedInfo() {
         EmbedBuilder builder = new EmbedBuilder().setTitle("Command: \"" + getName() + "\"")
                 .setColor(BotConfiguration.getPromptColor());
         if (getDescription() != null) {
@@ -269,28 +269,28 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @param roles is the roles to require
      */
-    protected void requireRoles(Set<Role> roles) {
+    public void requireRoles(Set<Role> roles) {
         requiredRoles.addAll(roles);
     }
 
     /**
      * @return whitelisted roles
      */
-    protected Set<Role> getRequiredRoles() {
+    public Set<Role> getRequiredRoles() {
         return requiredRoles;
     }
 
     /**
      * @param roles is the roles to blacklist
      */
-    protected void blacklistRoles(Set<Role> roles) {
+    public void blacklistRoles(Set<Role> roles) {
         blacklistedRoles.addAll(roles);
     }
 
     /**
      * @return blacklisted roles
      */
-    protected Set<Role> getBlacklistedRoles() {
+    public Set<Role> getBlacklistedRoles() {
         return blacklistedRoles;
     }
 
