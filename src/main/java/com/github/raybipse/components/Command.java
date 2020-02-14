@@ -173,7 +173,7 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param input is the original content of the message sent by the user. Input
+     * @param input the original content of the message sent by the user. Input
      *              must of been already checked for validity with
      *              {@link #getInputValidity(String)}
      * 
@@ -275,7 +275,7 @@ public abstract class Command extends ListenerAdapter {
      * Calling this method would mean users must have the roles supplied to this
      * method to invoke the command.
      * 
-     * @param roles is the roles to require
+     * @param roles the roles to require
      */
     public void requireRoles(Set<Role> roles) {
         requiredRoles.addAll(roles);
@@ -289,7 +289,7 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param roles is the roles to blacklist
+     * @param roles the roles to blacklist
      */
     public void blacklistRoles(Set<Role> roles) {
         blacklistedRoles.addAll(roles);
@@ -304,7 +304,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * 
-     * @param member is the user to be checked on
+     * @param member the user to be checked on
      * @return true if {@code member} contains all required roles and does not
      *         contain any blacklisted roles
      */
@@ -322,7 +322,7 @@ public abstract class Command extends ListenerAdapter {
      * Runs the returned consumer of {@link #getOnRolePermissionFail()} and throws
      * an exception if the user does not met expected permissions.
      * 
-     * @param event is the event of the message
+     * @param event the event of the message
      * 
      * @throws PermissionException if the user does not met expected permissions
      */
@@ -335,7 +335,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * 
-     * @param onRolePermissionFail is the lambda function to be called when a user
+     * @param onRolePermissionFail the lambda function to be called when a user
      *                             does not have the permission to invoke the
      *                             command
      */
@@ -353,8 +353,8 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param title is the title of the embed message
-     * @param description is the description of the embed message
+     * @param title the title of the embed message
+     * @param description the description of the embed message
      * 
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an
      *         specified title and description.
@@ -365,8 +365,8 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param requiredRoles    is the roles needed to invoke the command
-     * @param blacklistedRoles is the roles blacklisted from invoking the command
+     * @param requiredRoles    the roles needed to invoke the command
+     * @param blacklistedRoles the roles blacklisted from invoking the command
      * 
      * @return an embed message error that describes the roles needed or blacklisted
      *         from invoking the command
@@ -394,7 +394,7 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param errorName is the title of the embed message
+     * @param errorName the title of the embed message
      * 
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
      *         the user that input have invalid syntax or parameters.

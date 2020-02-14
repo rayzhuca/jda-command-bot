@@ -33,7 +33,7 @@ public class BotConfiguration {
      * Command} to register themselves as an
      * {@link net.dv8tion.jda.api.hooks.ListenerAdapter ListenerAdapter}.
      * 
-     * @param jda is the {@link JDA} obj to be set
+     * @param jda the {@link JDA} obj to be set
      */
     public static void setJDA(JDA jda) {
         BotConfiguration.jda = jda;
@@ -65,7 +65,7 @@ public class BotConfiguration {
      * If the bot prefix is "/", then a command may be invoked by a user typing:
      * [box prefix][command group prefix] [command prefix]
      * 
-     * @param botPrefix is the bot's prefix used to invoke to bot
+     * @param botPrefix the bot's prefix used to invoke to bot
      */
     public static void setBotPrefix(String botPrefix) {
         if (botPrefix == null) {
@@ -88,7 +88,7 @@ public class BotConfiguration {
      * Success color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
      * EmbedBuilder} made by default commands.
      * 
-     * @param successColor is the success color to be set
+     * @param successColor the success color to be set
      */
     public static void setSuccessColor(Color successColor) {
         if (successColor == null) {
@@ -111,7 +111,7 @@ public class BotConfiguration {
      * Error color may be used for {@link net.dv8tion.jda.api.EmbedBuilder
      * EmbedBuilder} made by default commands.
      * 
-     * @param errorColor is the error color to be set
+     * @param errorColor the error color to be set
      */
     public static void setErrorColor(Color errorColor) {
         if (errorColor == null) {
@@ -140,7 +140,7 @@ public class BotConfiguration {
      * Prompt color is also used for the
      * {@link com.github.raybipse.components.CommandGroup.Help Help} command
      * 
-     * @param promptColor is the prompt color to be set
+     * @param promptColor the prompt color to be set
      */
     public static void setPromptColor(Color promptColor) {
         if (promptColor == null) {
