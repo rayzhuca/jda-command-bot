@@ -155,12 +155,20 @@ public abstract class Command extends ListenerAdapter {
     protected boolean getInputValidity(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
         CommandGroup parent = getParent();
-
+        int inputLength = input.length();
+        String prefix;
+        
         if (parent == null) {
-            return input.startsWith(getPrefix(), BotConfiguration.getBotPrefix().length());
+            prefix = BotConfiguration.getBotPrefix() + getPrefix();
         } else {
-            return input.startsWith(getPrefix(),
-                    BotConfiguration.getBotPrefix().length() + parent.getPrefix().length() + 1);
+            prefix = BotConfiguration.getBotPrefix() + parent.getPrefix() + " " + getPrefix();
+        }
+        if (inputLength < prefix.length()) {
+            return false;
+        } else if (inputLength == prefix.length()) {
+            return input.equals(prefix);
+        } else {
+            return input.startsWith(prefix + " ");
         }
     }
 
