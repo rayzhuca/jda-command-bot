@@ -97,24 +97,25 @@ public abstract class CommandGroup {
             EmbedBuilder builder = null;
 
             if (arguments.length == 0 && getParent() != null) { // Shows a list of commands the command group has
-                builder = new EmbedBuilder().setTitle("Command Group: " + getParent().getName()).setColor(BotConfiguration.getPromptColor());
+                builder = new EmbedBuilder().setTitle("Command Group: \"" + getParent().getName() + "\"").setColor(BotConfiguration.getPromptColor());
+                builder.setDescription(getParent().getDescription());
+                builder.addField("Prefix", getParent().getPrefix(), false);
 
-                if (getParent().getChildren().length == 0) {
-                    builder.appendDescription("This command group contains no commands.");
+                if (getChildren().length == 0) {
+                    builder.addField("Commands", "This command group contains no commands.", false);
                 } else {
-                    StringBuilder stringBuilder = new StringBuilder(
-                            "This command group contains the following commands: ");
-                    for (Command children : getParent().getChildren()) {
-                        stringBuilder.append(children.getName() + ", ");
+                    String[] allCommandPrefixes = new String[getChildren().length];
+                    for (int i = 0; i < getChildren().length; i++) {
+                        allCommandPrefixes[i] = getChildren()[i].getPrefix();
                     }
-                    builder.appendDescription(stringBuilder.substring(0, stringBuilder.length() - 2) + ".");
+                    builder.addField("Commands", "``"+String.join("``, ``", allCommandPrefixes)+"``", false);
                 }
             } else if (arguments.length == 0 && getParent() == null) { // Shows the help command's info itself
                 builder = getEmbedInfo();
             } else { // Shows the command of the command group's children that the first arg
                      // specified
-                for (Command children : getParent().getChildren()) {
-                    if (children.getName().equalsIgnoreCase(arguments[0])) {
+                for (Command children : getChildren()) {
+                    if (children.getPrefix().equals(arguments[0])) {
                         builder = children.getEmbedInfo();
                         if (builder == null) {
                             builder = new EmbedBuilder()
