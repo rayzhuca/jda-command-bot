@@ -17,16 +17,16 @@ public class ErrorMessages {
     private ErrorMessages() {
     }
 
-    
     /**
-     * Returns {@code obj} if it is not {@code null}. Otherwise, throw a {@link NullPointerException}.
+     * Returns {@code obj} if it is not {@code null}. Otherwise, throw a
+     * {@link NullPointerException}.
      * 
      * @param <T> the type of {@code obj}
      * @param obj the obj to be checked for nullity
      * @param msg the message of the {@link NullPointerException}
      * 
-     * @return {@code obj}
-]     */
+     * @return {@code obj} ]
+     */
     public static <T> T requireNonNull(T obj, String msg) {
         if (obj != null) {
             return obj;
@@ -35,7 +35,8 @@ public class ErrorMessages {
     }
 
     /**
-     * Returns {@code obj} if it is not {code null}. Otherwise, throw a {@link NullPointerException}.
+     * Returns {@code obj} if it is not {code null}. Otherwise, throw a
+     * {@link NullPointerException}.
      * 
      * @param <T>       the type of {@code obj}
      * @param obj       the obj to be checked for nullity
@@ -51,7 +52,8 @@ public class ErrorMessages {
     }
 
     /**
-     * Returns {@code obj} if it is not {code null}. Otherwise, throw a {@link NullPointerException}.
+     * Returns {@code obj} if it is not {code null}. Otherwise, throw a
+     * {@link NullPointerException}.
      * 
      * <pre>
      * requireNonNullReturn(method(), "method");

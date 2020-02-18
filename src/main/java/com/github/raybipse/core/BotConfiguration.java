@@ -34,7 +34,7 @@ public class BotConfiguration {
     private static Set<CommandGroup> allCommandGroups = new HashSet<CommandGroup>();
 
     /**
-     * BotConfiguration cannot be instantized. 
+     * BotConfiguration cannot be instantized.
      */
     private BotConfiguration() {
     }
@@ -63,7 +63,8 @@ public class BotConfiguration {
     }
 
     /**
-     * The bot prefix is necessary to be appeneded on front of a message for a command to be invoked.
+     * The bot prefix is necessary to be appeneded on front of a message for a
+     * command to be invoked.
      * 
      * @return the box prefix
      */
@@ -72,7 +73,8 @@ public class BotConfiguration {
     }
 
     /**
-     * The bot prefix is necessary to be appeneded on front of a message for a command to be invoked.
+     * The bot prefix is necessary to be appeneded on front of a message for a
+     * command to be invoked.
      * 
      * @param botPrefix the bot's prefix used to invoke to bot
      */
@@ -168,8 +170,8 @@ public class BotConfiguration {
     }
 
     /**
-     * This method should be only called by jda-command-bot. All commands automatically
-     * register themselves via this method upon instantization.
+     * This method should be only called by jda-command-bot. All commands
+     * automatically register themselves via this method upon instantization.
      * 
      * @param command the command to be added to the list of commands
      */
@@ -178,8 +180,9 @@ public class BotConfiguration {
     }
 
     /**
-     * When called, the method gets the set returned by {@link #getAllCommands()} and filters out {@link Command}s
-     * that returns null in {@link Command#getParent()}.
+     * When called, the method gets the set returned by {@link #getAllCommands()}
+     * and filters out {@link Command}s that returns null in
+     * {@link Command#getParent()}.
      * 
      * @return a {@link Set} of all {@link Command}s that do not have a parent
      */
@@ -195,10 +198,11 @@ public class BotConfiguration {
     }
 
     /**
-     * This method should be only called by jda-command-bot. All commands groups automatically
-     * register themselves via this method upon instantization.
+     * This method should be only called by jda-command-bot. All commands groups
+     * automatically register themselves via this method upon instantization.
      * 
-     * @param commandGroup the command group to be added to the list of all command groups
+     * @param commandGroup the command group to be added to the list of all command
+     *                     groups
      */
     public static void addCommandGroup(CommandGroup commandGroup) {
         allCommandGroups.add(commandGroup);

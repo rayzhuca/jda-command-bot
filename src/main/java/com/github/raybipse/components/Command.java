@@ -171,11 +171,12 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param examples the examples to be added to the list of examples. The examples can be null. The
-     *                 examples passed can be null.
+     * @param examples the examples to be added to the list of examples. The
+     *                 examples can be null. The examples passed can be null.
      */
     public void addExamples(String... examples) {
-        if (examples == null) return;
+        if (examples == null)
+            return;
         for (String example : examples) {
             if (examples != null)
                 this.examples.add(example);
