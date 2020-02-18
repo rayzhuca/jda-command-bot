@@ -40,6 +40,9 @@ public abstract class CommandGroup {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
         ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
         ErrorMessages.requireNonNullReturn(getChildren(), "getChildren");
+        
+        this.name = name;
+        this.prefix = prefix;
     }
 
     /**
