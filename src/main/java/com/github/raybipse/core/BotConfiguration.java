@@ -2,7 +2,9 @@ package com.github.raybipse.core;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.raybipse.components.Command;
@@ -30,8 +32,8 @@ public class BotConfiguration {
 
     private static JDA jda;
 
-    private static List<Command> allCommands = new ArrayList<Command>();
-    private static List<CommandGroup> allCommandGroups = new ArrayList<CommandGroup>();
+    private static Set<Command> allCommands = new HashSet<Command>();
+    private static Set<CommandGroup> allCommandGroups = new HashSet<CommandGroup>();
 
     /**
      * BotConfiguration cannot be instantized. 
@@ -161,26 +163,46 @@ public class BotConfiguration {
     /**
      * Gets all standalone commands as well as commands in {@link CommandGroup}.
      * 
-     * @return a {@link List} of all {@link Command}
+     * @return a {@link Set} of all {@link Command}
      */
-    public static List<Command> getAllCommands() {
+    public static Set<Command> getAllCommands() {
         return allCommands;
     }
 
     /**
-     * When called, the method gets the list returned by {@link #getAllCommands()} and filters out {@link Command}s
+     * This method should be only called by jda-command-bot. All commands automatically
+     * register themselves via this method upon instantization.
+     * 
+     * @param command the command to be added to the list of commands
+     */
+    public static void addCommand(Command command) {
+        allCommands.add(command);
+    }
+
+    /**
+     * When called, the method gets the set returned by {@link #getAllCommands()} and filters out {@link Command}s
      * that returns null in {@link Command#getParent()}.
      * 
-     * @return a {@link List} of all {@link Command}s that do not have a parent
+     * @return a {@link Set} of all {@link Command}s that do not have a parent
      */
-    public static List<Command> getAllStandaloneCommands() {
-        return allCommands.stream().filter((v) -> v.getParent() == null).collect(Collectors.toList());
+    public static Set<Command> getAllStandaloneCommands() {
+        return allCommands.stream().filter((v) -> v.getParent() == null).collect(Collectors.toSet());
     }
 
     /**
      * @return all the {@link CommandGroup}s
      */
-    public static List<CommandGroup> getAllCommandGroups() {
+    public static Set<CommandGroup> getAllCommandGroups() {
         return allCommandGroups;
+    }
+
+    /**
+     * This method should be only called by jda-command-bot. All commands groups automatically
+     * register themselves via this method upon instantization.
+     * 
+     * @param commandGroup the command group to be added to the list of all command groups
+     */
+    public static void addCommandGroup(CommandGroup commandGroup) {
+        allCommandGroups.add(commandGroup);
     }
 }
