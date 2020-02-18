@@ -1,5 +1,8 @@
 package com.github.raybipse.components;
 
+import static com.github.raybipse.internal.ErrorMessages.requireNonNullParam;
+import static com.github.raybipse.internal.ErrorMessages.requireNonNullReturn;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.github.raybipse.core.BotConfiguration;
 import com.github.raybipse.internal.ErrorMessages;
+import com.github.raybipse.internal.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -49,67 +53,151 @@ import net.dv8tion.jda.api.utils.MarkdownUtil;
  */
 public abstract class Command extends ListenerAdapter {
 
+    private String name;
+    private String prefix;
+    private String description;
+    private String syntax;
+    private List<String> examples;
+    private CommandGroup parent;
+
     private Set<Role> requiredRoles = new HashSet<>();
     private Set<Role> blacklistedRoles = new HashSet<>();
-    private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> 
-            event.getChannel().sendMessage(getEmbedPermissionError(requiredRoles, blacklistedRoles).build()).queue();
+    private Consumer<MessageReceivedEvent> onRolePermissionFail = (event) -> event.getChannel()
+            .sendMessage(getEmbedPermissionError(requiredRoles, blacklistedRoles).build()).queue();
 
-    public Command() {
-        ErrorMessages.requireNonNullReturn(getName(), "getName");
-        ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
-        ErrorMessages.requireNonNullReturn(getSyntax(), "getSyntax");
+    /**
+     * The constructor for the command.
+     * 
+     * @param name   the name of the command
+     * @param prefix the prefix of the command
+     */
+    public Command(String name, String prefix) {
+        requireNonNullReturn(getName(), "getName");
+        requireNonNullReturn(getPrefix(), "getPrefix");
+        requireNonNullReturn(getSyntax(), "getSyntax");
 
         BotConfiguration.getJDA().addEventListener(this);
     }
 
     /**
-     * @return the name of the command. The name cannot be null.
+     * @return the name of the command. The name cannot be {@code null}.
      */
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
-     * @return the prefix used to invoke the command. The prefix cannot be null.
+     * @param name the name of the command. The name cannot be {@code null}.
      */
-    public abstract String getPrefix();
+    public void setName(String name) {
+        requireNonNullParam(name, "name");
+        this.name = name;
+    }
 
     /**
-     * @return the description of the command. Return null if there is none.
+     * @return the prefix used to invoke the command. The prefix cannot be
+     *         {@code null}.
      */
-    public abstract String getDescription();
+    public String getPrefix() {
+        return prefix;
+    }
 
     /**
-     * @return an array of examples showcasing how to use the command. The array can
-     *         be empty or null. The return value should only contain the example concerned after the
-     *          prefix(es). The bot prefix, {@link CommandGroup} prefix, and command
-     *          prefix will automatically be added. E.g., a return value of
-     *          "[parameters...]" would become "[bot prefix][command group prefix]
-     *          [prefix] [parameters...]".
+     * @param prefix the prefix used to invoke the command. The prefix cannot be
+     *               {@code null}.
      */
-    public abstract String[] getExamples();
+    public void setPrefix(String prefix) {
+        requireNonNullParam(prefix, "prefix");
+        this.prefix = prefix;
+    }
 
     /**
+     * @return the description of the command. The description can be {@code null}.
+     */
+    public @Nullable String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description of the command. The description can be
+     *                    {@code null}.
+     */
+    public void setDescription(@Nullable String description) {
+        requireNonNullParam(description, "description");
+        this.description = description;
+    }
+
+    /**
+     * @return the syntax of the command. The syntax can be {@code null}. The return
+     *         value should only contain the syntax concerned after the prefix(es).
+     *         The bot prefix, {@link CommandGroup} prefix, and command prefix will
+     *         automatically be added. E.g., a return value of "[parameters...]"
+     *         would become "[bot prefix][command group prefix] [prefix]
+     *         [parameters...]".
+     */
+    public @Nullable String getSyntax() {
+        return syntax;
+    }
+
+    /**
+     * @param syntax the syntax of the command. The syntax can be {@code null}.
+     */
+    public void setSyntax(@Nullable String syntax) {
+        this.syntax = syntax;
+    }
+
+    /**
+     * @return a list of examples showcasing how to use the command. The example can
+     *         be {@code null} or empty. The return value should only contain the
+     *         example concerned after the prefix(es). The bot prefix,
+     *         {@link CommandGroup} prefix, and command prefix will automatically be
+     *         added. E.g., a return value of "[parameters...]" would become "[bot
+     *         prefix][command group prefix] [prefix] [parameters...]".
+     */
+    public @Nullable List<String> getExamples() {
+        return examples;
+    }
+
+    /**
+     * @param examples the examples of the command. The example can be {@code null}
+     *                 or empty.
+     */
+    public void setExamples(@Nullable List<String> examples) {
+        this.examples = examples;
+    }
+
+    /**
+     * @param examples the examples to be added to the list of examples. The examples can be null. The
+     *                 examples passed can be null.
+     */
+    public void addExamples(String... examples) {
+        if (examples == null) return;
+        for (String example : examples) {
+            if (examples != null)
+                this.examples.add(example);
+        }
+    }
+
+    /**
+     * @return the parent of the command. The parent can be {@code null}.
+     */
+    public @Nullable CommandGroup getParent() {
+        return parent;
+    }
+
+    /**
+     * @param parent the parent of the command. The parent can be {@code null}.
+     */
+    public void setParent(@Nullable CommandGroup parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * This method is used by the parent's default help command. Override this
+     * method and return null if you wish to not show information about this
+     * command.
      * 
-     * 
-     * @return the syntax of the command. The syntax cannot be null. The return value should only contain the syntax concerned after the
-     *          prefix(es). The bot prefix, {@link CommandGroup} prefix, and command
-     *          prefix will automatically be added. E.g., a return value of
-     *          "[parameters...]" would become "[bot prefix][command group prefix]
-     *          [prefix] [parameters...]".
-     */
-    public abstract String getSyntax();
-
-    /**
-     * @return the parent command group of the command. Return null if there is
-     *         none.
-     */
-    public abstract CommandGroup getParent();
-
-    /**
-     * This method is used by the parent's default help command. Override
-     *          this method and return null if you wish to not show information
-     *          about this command.
-     * 
-     * @return information of the command
+     * @return the information of the command
      */
     public EmbedBuilder getEmbedInfo() {
         EmbedBuilder builder = new EmbedBuilder().setTitle("Command: \"" + getName() + "\"")
@@ -122,15 +210,18 @@ public abstract class Command extends ListenerAdapter {
         }
         builder.addField("Prefix", getPrefix(), false);
 
-        if (getParent() != null)
-            builder.addField("Syntax", MarkdownUtil.monospace(
-                    BotConfiguration.getBotPrefix() + getParent().getPrefix() + " " + getPrefix() + " " + getSyntax()),
-                    false);
-        else
-            builder.addField("Syntax",
-                    MarkdownUtil.monospace(BotConfiguration.getBotPrefix() + getPrefix() + " " + getSyntax()), false);
+        if (getSyntax() != null) {
+            if (getParent() != null)
+                builder.addField("Syntax", MarkdownUtil.monospace(BotConfiguration.getBotPrefix()
+                        + getParent().getPrefix() + " " + getPrefix() + " " + getSyntax()), false);
+            else {
+                builder.addField("Syntax",
+                        MarkdownUtil.monospace(BotConfiguration.getBotPrefix() + getPrefix() + " " + getSyntax()),
+                        false);
+            }
+        }
 
-        if (getExamples() != null && getExamples().length != 0) {
+        if (getExamples() != null && getExamples().size() != 0) {
             StringBuilder exampleValue = new StringBuilder();
             for (String example : getExamples()) {
                 if (getParent() != null) {
@@ -140,7 +231,7 @@ public abstract class Command extends ListenerAdapter {
                     exampleValue.append(BotConfiguration.getBotPrefix() + getPrefix() + " " + example + "\n");
                 }
             }
-            builder.addField("Example" + (getExamples().length > 1 ? "s" : ""),
+            builder.addField("Example" + (getExamples().size() > 1 ? "s" : ""),
                     MarkdownUtil.monospace(exampleValue.toString()), false);
         }
 
@@ -152,12 +243,12 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @return true if message invokes the command
      */
-    protected boolean getInputValidity(String input) {
+    public boolean getInputValidity(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
         CommandGroup parent = getParent();
         int inputLength = input.length();
         String prefix;
-        
+
         if (parent == null) {
             prefix = BotConfiguration.getBotPrefix() + getPrefix();
         } else {
@@ -173,13 +264,13 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @param input the original content of the message sent by the user. Input
-     *              must of been already checked for validity with
+     * @param input the original content of the message sent by the user. Input must
+     *              of been already checked for validity with
      *              {@link #getInputValidity(String)}
      * 
      * @return a string without command group (if it exists) and command prefix
      */
-    protected String trimInputBeginning(String input) {
+    public String trimInputBeginning(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
         CommandGroup parent = getParent();
         input = input.substring(BotConfiguration.getBotPrefix().length());
@@ -201,7 +292,7 @@ public abstract class Command extends ListenerAdapter {
     /**
      * @param c the character to be checked
      * 
-     * @return true if parameter c is ' or "
+     * @return true if {@code c} is {@code "}
      */
     private static boolean isCharQuotationMark(char c) {
         return c == '\"' || c == '\'';
@@ -222,9 +313,10 @@ public abstract class Command extends ListenerAdapter {
      * </pre>
      * 
      * @param input must be already trimed with {@link #trimInputBeginning(String)}
+     * 
      * @return an array of separated arguments
      */
-    protected static String[] splitUserInput(String input) {
+    public static String[] splitUserInput(String input) {
         ErrorMessages.requireNonNullParam(input, "input");
         input = input.trim();
         ArrayList<String> output = new ArrayList<>();
@@ -252,6 +344,7 @@ public abstract class Command extends ListenerAdapter {
      * that does not have a blackslash behind it.
      * 
      * @param input the input to be evaluated
+     * 
      * @return the {@code input} without the specified blackslashs and quotes
      */
     private static ArrayList<String> takeOutBackslashAndQuote(ArrayList<String> input) {
@@ -305,10 +398,11 @@ public abstract class Command extends ListenerAdapter {
     /**
      * 
      * @param member the user to be checked on
+     * 
      * @return true if {@code member} contains all required roles and does not
      *         contain any blacklisted roles
      */
-    protected boolean checkUserRolePermission(Member member) {
+    public boolean checkUserRolePermission(Member member) {
         List<Role> userRoles = member.getRoles();
         for (Role role : getBlacklistedRoles()) {
             if (userRoles.contains(role)) {
@@ -326,7 +420,7 @@ public abstract class Command extends ListenerAdapter {
      * 
      * @throws PermissionException if the user does not met expected permissions
      */
-    protected void enforceUserRolePermission(MessageReceivedEvent event) {
+    public void enforceUserRolePermission(MessageReceivedEvent event) {
         if (!checkUserRolePermission(event.getMember())) {
             getOnRolePermissionFail().accept(event);
             throw new PermissionException("Member does not meet requirements to invoke the command.");
@@ -334,12 +428,10 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * 
-     * @param onRolePermissionFail the lambda function to be called when a user
-     *                             does not have the permission to invoke the
-     *                             command
+     * @param onRolePermissionFail the lambda function to be called when a user does
+     *                             not have the permission to invoke the command
      */
-    protected void setOnRolePermissionFail(Consumer<MessageReceivedEvent> onRolePermissionFail) {
+    public void setOnRolePermissionFail(Consumer<MessageReceivedEvent> onRolePermissionFail) {
         ErrorMessages.requireNonNullParam(onRolePermissionFail, "onRolePermissionFail");
         this.onRolePermissionFail = onRolePermissionFail;
     }
@@ -348,18 +440,18 @@ public abstract class Command extends ListenerAdapter {
      * @return the lambda function called when a user does not have the permission
      *         to invoke the command
      */
-    protected Consumer<MessageReceivedEvent> getOnRolePermissionFail() {
+    public Consumer<MessageReceivedEvent> getOnRolePermissionFail() {
         return onRolePermissionFail;
     }
 
     /**
-     * @param title the title of the embed message
+     * @param title       the title of the embed message
      * @param description the description of the embed message
      * 
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} with an
      *         specified title and description.
      */
-    protected EmbedBuilder getEmbedSimpleError(String title, String description) {
+    public EmbedBuilder getEmbedSimpleError(String title, String description) {
         return new EmbedBuilder().setTitle(title).setColor(BotConfiguration.getErrorColor())
                 .setDescription(description);
     }
@@ -371,7 +463,7 @@ public abstract class Command extends ListenerAdapter {
      * @return an embed message error that describes the roles needed or blacklisted
      *         from invoking the command
      */
-    protected EmbedBuilder getEmbedPermissionError(Set<Role> requiredRoles, Set<Role> blacklistedRoles) {
+    public EmbedBuilder getEmbedPermissionError(Set<Role> requiredRoles, Set<Role> blacklistedRoles) {
         String description = "";
         if (requiredRoles != null && !requiredRoles.isEmpty()) {
             description += "The role"
@@ -402,7 +494,7 @@ public abstract class Command extends ListenerAdapter {
      * @see #getEmbedMissingArguments()
      * @see #getEmbedInvalidParameterTypes()
      */
-    protected EmbedBuilder getEmbedInvalidParameterError(String errorName) {
+    public EmbedBuilder getEmbedInvalidParameterError(String errorName) {
         ErrorMessages.requireNonNullParam(errorName, "errorName");
         EmbedBuilder builder = new EmbedBuilder().setTitle(errorName).setColor(BotConfiguration.getErrorColor());
 
@@ -426,21 +518,22 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
-     *         the user that input have missing arguments. This is the equivalent of the return value of
-     *          {@link #getEmbedInvalidParameterError(String)} with "Missing
-     *          Argument(s) Error" as the errorName parameter
+     *         the user that input have missing arguments. This is the equivalent of
+     *         the return value of {@link #getEmbedInvalidParameterError(String)}
+     *         with "Missing Argument(s) Error" as the errorName parameter
      */
-    protected EmbedBuilder getEmbedMissingArguments() {
+    public EmbedBuilder getEmbedMissingArguments() {
         return getEmbedInvalidParameterError("Missing Argument(s) Error");
     }
 
     /**
      * @return an {@link net.dv8tion.jda.api.EmbedBuilder EmbedBuilder} that alerts
-     *         the user that input have invalid parameter types. This is the equivalent of the return value of
-     *          {@link #getEmbedInvalidParameterError(String)} with "Invalid
-     *          Parameter Type(s)" as the errorName parameter
+     *         the user that input have invalid parameter types. This is the
+     *         equivalent of the return value of
+     *         {@link #getEmbedInvalidParameterError(String)} with "Invalid
+     *         Parameter Type(s)" as the errorName parameter
      */
-    protected EmbedBuilder getEmbedInvalidParameterTypes() {
+    public EmbedBuilder getEmbedInvalidParameterTypes() {
         return getEmbedInvalidParameterError("Invalid Parameter Type(s)");
     }
 }
