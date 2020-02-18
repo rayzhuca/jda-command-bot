@@ -43,6 +43,8 @@ public abstract class CommandGroup {
         
         this.name = name;
         this.prefix = prefix;
+
+        BotConfiguration.addCommandGroup(this);
     }
 
     /**
