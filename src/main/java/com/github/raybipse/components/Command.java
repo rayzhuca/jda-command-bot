@@ -76,6 +76,9 @@ public abstract class Command extends ListenerAdapter {
         requireNonNullReturn(getPrefix(), "getPrefix");
         requireNonNullReturn(getSyntax(), "getSyntax");
 
+        this.name = name;
+        this.prefix = prefix;
+
         BotConfiguration.getJDA().addEventListener(this);
         BotConfiguration.addCommand(this);
     }
