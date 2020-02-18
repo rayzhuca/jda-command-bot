@@ -1,7 +1,12 @@
 package com.github.raybipse.core;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.github.raybipse.components.Command;
+import com.github.raybipse.components.CommandGroup;
 import com.github.raybipse.internal.ErrorMessages;
 
 import net.dv8tion.jda.api.JDA;
@@ -25,6 +30,12 @@ public class BotConfiguration {
 
     private static JDA jda;
 
+    private static List<Command> allCommands = new ArrayList<Command>();
+    private static List<CommandGroup> allCommandGroups = new ArrayList<CommandGroup>();
+
+    /**
+     * BotConfiguration cannot be instantized. 
+     */
     private BotConfiguration() {
     }
 
@@ -52,8 +63,7 @@ public class BotConfiguration {
     }
 
     /**
-     * If the bot prefix is "/", then a command may be invoked by a user typing:
-     * [box prefix][command group prefix] [command prefix]
+     * The bot prefix is necessary to be appeneded on front of a message for a command to be invoked.
      * 
      * @return the box prefix
      */
@@ -62,8 +72,7 @@ public class BotConfiguration {
     }
 
     /**
-     * If the bot prefix is "/", then a command may be invoked by a user typing:
-     * [box prefix][command group prefix] [command prefix]
+     * The bot prefix is necessary to be appeneded on front of a message for a command to be invoked.
      * 
      * @param botPrefix the bot's prefix used to invoke to bot
      */
@@ -147,5 +156,31 @@ public class BotConfiguration {
             throw new IllegalArgumentException("\"promptColor\" cannot be null.");
         }
         BotConfiguration.promptColor = promptColor;
+    }
+
+    /**
+     * Gets all standalone commands as well as commands in {@link CommandGroup}.
+     * 
+     * @return a {@link List} of all {@link Command}
+     */
+    public static List<Command> getAllCommands() {
+        return allCommands;
+    }
+
+    /**
+     * When called, the method gets the list returned by {@link #getAllCommands()} and filters out {@link Command}s
+     * that returns null in {@link Command#getParent()}.
+     * 
+     * @return a {@link List} of all {@link Command}s that do not have a parent
+     */
+    public static List<Command> getAllStandaloneCommands() {
+        return allCommands.stream().filter((v) -> v.getParent() == null).collect(Collectors.toList());
+    }
+
+    /**
+     * @return all the {@link CommandGroup}s
+     */
+    public static List<CommandGroup> getAllCommandGroups() {
+        return allCommandGroups;
     }
 }
