@@ -1,5 +1,9 @@
 package com.github.raybipse.components;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.github.raybipse.core.BotConfiguration;
 import com.github.raybipse.internal.ErrorMessages;
 
@@ -8,42 +12,110 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * An entity that groups {@link Command} into a group. Children of the command
- * group can only be invoked if the {@link CommandGroup}'s prefix is added
- * before the command prefix.
+ * group can only be invoked if the {@link CommandGroup}'s prefix and a space is
+ * appended before the command prefix.
  * 
  * A command group can sometimes be referred as the parent of the commands
- * returned in {@link #getChildren()}.
+ * returned in {@link #getChildren()}. The returned
+ * {@link com.github.raybipse.components.Command Command} from
+ * {@link #getChildren()} can also be referred to as the children of the
+ * command.
  * 
  * @author RayBipse
  */
 public abstract class CommandGroup {
 
-    protected CommandGroup() {
+    private String name;
+    private String prefix;
+    private String description;
+    private List<Command> children;
+
+    /**
+     * The constructor for CommandGroup.
+     * 
+     * @param name   the name of the command group
+     * @param prefix the prefix used for the command group to be invoked
+     */
+    public CommandGroup(String name, String prefix) {
         ErrorMessages.requireNonNullReturn(getName(), "getName");
         ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
         ErrorMessages.requireNonNullReturn(getChildren(), "getChildren");
     }
 
     /**
-     * @return the name of the command group. The name cannot be null.
+     * @return the name of the command group. The name cannot be {@code null}.
      */
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
-     * @return the description of the command group. Return null if there is none.
+     * @param name the name of the command group. The name cannot be {@code null}.
      */
-    public abstract String getDescription();
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /**
-     * @return an array of commands the group directly inherits. Return an empty
-     *         array is there is none. Do not return null.
+     * @return the prefix of the command group. The prefix cannot be {@code null}.
      */
-    public abstract Command[] getChildren();
+    public String getPrefix() {
+        return prefix;
+    }
 
     /**
-     * @return the syntax of the command group. The prefix cannot be null.
+     * @param prefix the prefix of the command group. The prefix cannot be
+     *               {@code null}.
      */
-    public abstract String getPrefix();
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    /**
+     * @return the description of the command group. The description can be
+     *         {@code null}.
+     */
+    public @Nullable String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description of the command group. The description can
+     *                    be {@code null}.
+     */
+    public void setDescription(@Nullable String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return a list of commands that the command group directly inherits. The list
+     *         can be {@code null} or empty.
+     */
+    public @Nullable List<Command> getChildren() {
+        return children;
+    }
+
+    /**
+     * @param children the children of the command group. The children can be
+     *                 {@code null} or empty.
+     */
+    public void setChildren(@Nullable List<Command> children) {
+        this.children = children;
+    }
+
+    /**
+     * @param children the children to be added to the list of childrens. The
+     *                 children can be null. The elements in {@code children} can be
+     *                 null.
+     */
+    public void addChildren(Command... children) {
+        if (children == null)
+            return;
+        for (Command child : children) {
+            if (child != null)
+                this.children.add(child);
+        }
+    }
 
     /**
      * A command that gives information about for the {@link CommandGroup} and its
@@ -53,34 +125,12 @@ public abstract class CommandGroup {
      */
     public class Help extends Command {
 
-        @Override
-        public String getName() {
-            return "Help";
-        }
-
-        @Override
-        public String getDescription() {
-            return "Gives information about the specified command.";
-        }
-
-        @Override
-        public String getPrefix() {
-            return "help";
-        }
-
-        @Override
-        public String[] getExamples() {
-            return new String[] { "help" };
-        }
-
-        @Override
-        public String getSyntax() {
-            return "[command]";
-        }
-
-        @Override
-        public CommandGroup getParent() {
-            return CommandGroup.this;
+        public Help() {
+            super("Help", "help");
+            setDescription("Gives information about the specified command.");
+            setSyntax("[the command's prefix]");
+            addExamples("help");
+            setParent(CommandGroup.this);
         }
 
         @Override
@@ -97,18 +147,19 @@ public abstract class CommandGroup {
             EmbedBuilder builder = null;
 
             if (arguments.length == 0 && getParent() != null) { // Shows a list of commands the command group has
-                builder = new EmbedBuilder().setTitle("Command Group: \"" + getParent().getName() + "\"").setColor(BotConfiguration.getPromptColor());
+                builder = new EmbedBuilder().setTitle("Command Group: \"" + getParent().getName() + "\"")
+                        .setColor(BotConfiguration.getPromptColor());
                 builder.setDescription(getParent().getDescription());
                 builder.addField("Prefix", getParent().getPrefix(), false);
 
-                if (getChildren().length == 0) {
+                if (getChildren().size() == 0) {
                     builder.addField("Commands", "This command group contains no commands.", false);
                 } else {
-                    String[] allCommandPrefixes = new String[getChildren().length];
-                    for (int i = 0; i < getChildren().length; i++) {
-                        allCommandPrefixes[i] = getChildren()[i].getPrefix();
+                    String[] allCommandPrefixes = new String[getChildren().size()];
+                    for (int i = 0; i < getChildren().size(); i++) {
+                        allCommandPrefixes[i] = getChildren().get(i).getPrefix();
                     }
-                    builder.addField("Commands", "``"+String.join("``, ``", allCommandPrefixes)+"``", false);
+                    builder.addField("Commands", "``" + String.join("``, ``", allCommandPrefixes) + "``", false);
                 }
             } else if (arguments.length == 0 && getParent() == null) { // Shows the help command's info itself
                 builder = getEmbedInfo();
