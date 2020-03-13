@@ -1,6 +1,7 @@
 package com.github.raybipse.components;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +29,7 @@ public abstract class CommandGroup {
     private String name;
     private String prefix;
     private String description;
-    private List<Command> children;
+    private Set<Command> children;
 
     /**
      * The constructor for CommandGroup.
@@ -96,7 +97,7 @@ public abstract class CommandGroup {
      * @return a list of commands that the command group directly inherits. The list
      *         can be {@code null} or empty.
      */
-    public @Nullable List<Command> getChildren() {
+    public @Nullable Set<Command> getChildren() {
         return children;
     }
 
@@ -104,7 +105,7 @@ public abstract class CommandGroup {
      * @param children the children of the command group. The children can be
      *                 {@code null} or empty.
      */
-    public void setChildren(@Nullable List<Command> children) {
+    public void setChildren(@Nullable Set<Command> children) {
         this.children = children;
     }
 
@@ -160,10 +161,10 @@ public abstract class CommandGroup {
                 if (getChildren().size() == 0) {
                     builder.addField("Commands", "This command group contains no commands.", false);
                 } else {
-                    String[] allCommandPrefixes = new String[getChildren().size()];
-                    for (int i = 0; i < getChildren().size(); i++) {
-                        allCommandPrefixes[i] = getChildren().get(i).getPrefix();
-                    }
+                    // for (Command children : getChildren()) {
+                    //     allCommandPrefixes[i] = children.getPrefix();
+                    // }
+                    String[] allCommandPrefixes = getChildren().stream().map(Command::getPrefix).toArray(String[]::new);
                     builder.addField("Commands", "``" + String.join("``, ``", allCommandPrefixes) + "``", false);
                 }
             } else if (arguments.length == 0 && getParent() == null) { // Shows the help command's info itself
