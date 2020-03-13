@@ -1,5 +1,7 @@
 package com.github.raybipse.components;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -115,6 +117,8 @@ public abstract class CommandGroup {
     public void addChildren(Command... children) {
         if (children == null)
             return;
+        if (this.children == null)
+            this.children = new HashSet<Command>();
         for (Command child : children) {
             if (child != null)
                 this.children.add(child);

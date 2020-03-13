@@ -176,6 +176,8 @@ public abstract class Command extends ListenerAdapter {
     public void addExamples(String... examples) {
         if (examples == null)
             return;
+        if (this.examples == null)
+            this.examples = new ArrayList<>();
         for (String example : examples) {
             if (examples != null)
                 this.examples.add(example);
