@@ -72,13 +72,12 @@ public abstract class Command extends ListenerAdapter {
      * @param prefix the prefix of the command
      */
     public Command(String name, String prefix) {
-        requireNonNullReturn(getName(), "getName");
-        requireNonNullReturn(getPrefix(), "getPrefix");
-        requireNonNullReturn(getSyntax(), "getSyntax");
-
         setName(name);
         setPrefix(prefix);
 
+        requireNonNullReturn(getName(), "getName");
+        requireNonNullReturn(getPrefix(), "getPrefix");
+        
         BotConfiguration.getJDA().addEventListener(this);
         BotConfiguration.addCommand(this);
     }

@@ -1,6 +1,5 @@
 package com.github.raybipse.components;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -38,12 +37,11 @@ public abstract class CommandGroup {
      * @param prefix the prefix used for the command group to be invoked
      */
     public CommandGroup(String name, String prefix) {
-        ErrorMessages.requireNonNullReturn(getName(), "getName");
-        ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
-        ErrorMessages.requireNonNullReturn(getChildren(), "getChildren");
-
         setName(name);
         setPrefix(prefix);
+
+        ErrorMessages.requireNonNullReturn(getName(), "getName");
+        ErrorMessages.requireNonNullReturn(getPrefix(), "getPrefix");
 
         BotConfiguration.addCommandGroup(this);
     }
