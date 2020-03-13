@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.github.raybipse.core.BotConfiguration;
@@ -58,7 +59,7 @@ public abstract class Command extends ListenerAdapter {
     private String description;
     private String syntax;
     private List<String> examples;
-    private CommandGroup parent;
+    private Supplier<CommandGroup> parentSupplier;
 
     private Set<Role> requiredRoles = new HashSet<>();
     private Set<Role> blacklistedRoles = new HashSet<>();
@@ -185,17 +186,18 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * @return the parent of the command. The parent can be {@code null}.
+     * @return the supplier of the parent of the command. The supplier can be {@code null}.
      */
     public @Nullable CommandGroup getParent() {
-        return parent;
+        if (parentSupplier == null) return null;
+        return parentSupplier.get();
     }
 
     /**
-     * @param parent the parent of the command. The parent can be {@code null}.
+     * @param parentSupplier the supplier of the parent of the command. The supplier can be {@code null}.
      */
-    public void setParent(@Nullable CommandGroup parent) {
-        this.parent = parent;
+    public void setParent(@Nullable Supplier<CommandGroup> parentSupplier) {
+        this.parentSupplier = parentSupplier;
     }
 
     /**

@@ -34,7 +34,7 @@ public class SimpleCommand extends Command {
         setDescription(description);
         setExamples(examples);
         setSyntax(syntax);
-        setParent(parent);
+        setParent(() -> parent);
     }
 
     /**

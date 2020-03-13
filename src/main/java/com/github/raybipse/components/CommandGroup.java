@@ -1,6 +1,5 @@
 package com.github.raybipse.components;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -138,7 +137,7 @@ public abstract class CommandGroup {
             setDescription("Gives information about the specified command.");
             setSyntax("[the command's prefix]");
             addExamples("help");
-            setParent(CommandGroup.this);
+            setParent(() -> CommandGroup.this);
         }
 
         @Override
