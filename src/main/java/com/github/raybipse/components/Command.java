@@ -303,7 +303,7 @@ public abstract class Command extends ListenerAdapter {
      * @return true if {@code c} is {@code "}
      */
     private static boolean isCharQuotationMark(char c) {
-        return c == '\"' || c == '\'';
+        return c == '\"';
     }
 
     /**
