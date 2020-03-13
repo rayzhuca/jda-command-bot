@@ -107,7 +107,6 @@ public class SimpleCommand extends Command {
         private List<? extends Function<? super T, Boolean>> filters;
 
         /**
-         * @param <T>        the type of the class to be listened to
          * @param eventClass the class to be listened to
          * @param consumer   the consumer to be called when
          * @param filters    the filters that acts as prerequisites for the consumer to
