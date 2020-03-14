@@ -3,9 +3,13 @@ package com.github.raybipse.components;
 import static com.github.raybipse.internal.ErrorMessages.requireNonNullParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.github.raybipse.internal.Nullable;
 
@@ -38,6 +42,15 @@ public class SimpleCommand extends Command {
     }
 
     /**
+     * Returns itself. This could be useful when adding filters.
+     * 
+     * @return the instance
+     */
+    public SimpleCommand getThis() {
+        return this;
+    }
+
+    /**
      * @param consumer the consumer to be called when a {@link MessageReceivedEvent}
      *                 is called
      * @param filters  the filters that acts as prerequisites for the consumer to be
@@ -46,8 +59,22 @@ public class SimpleCommand extends Command {
      * @return {@code this}
      */
     public SimpleCommand withMessageReceivedEvent(Consumer<MessageReceivedEvent> consumer,
-            @Nullable List<Function<? super MessageReceivedEvent, Boolean>> filters) {
+            @Nullable Collection<Predicate<? super MessageReceivedEvent>> filters) {
         eventListeners.add(new GenericEventEntry<MessageReceivedEvent>(MessageReceivedEvent.class, consumer, filters));
+        return this;
+    }
+
+    /**
+     * @param consumer the consumer to be called when a {@link MessageReceivedEvent}
+     *                 is called
+     * @param filter  the filter that acts as prerequisites for the consumer to be
+     *                 called
+     * 
+     * @return {@code this}
+     */
+    public SimpleCommand withMessageReceivedEvent(Consumer<MessageReceivedEvent> consumer,
+            @Nullable Predicate<? super MessageReceivedEvent> filter) {
+        eventListeners.add(new GenericEventEntry<MessageReceivedEvent>(MessageReceivedEvent.class, consumer, List.of(filter)));
         return this;
     }
 
@@ -58,7 +85,7 @@ public class SimpleCommand extends Command {
      * @return {@code this}
      */
     public SimpleCommand withMessageReceivedEvent(Consumer<MessageReceivedEvent> consumer) {
-        eventListeners.add(new GenericEventEntry<MessageReceivedEvent>(MessageReceivedEvent.class, consumer, null));
+        eventListeners.add(new GenericEventEntry<MessageReceivedEvent>(MessageReceivedEvent.class, consumer, List.of()));
         return this;
     }
 
@@ -84,8 +111,23 @@ public class SimpleCommand extends Command {
      * @return {@code this}
      */
     public <T extends GenericEvent> SimpleCommand withEvent(Class<T> eventClass, Consumer<T> consumer,
-            @Nullable List<? extends Function<? super T, Boolean>> filters) {
+            @Nullable Collection<Predicate<? super T>> filters) {
         return withEvent(new GenericEventEntry<T>(eventClass, consumer, filters));
+    }
+
+    /**
+     * 
+     * @param <T>        the type of the class to be listened to
+     * @param eventClass the class to be listened to
+     * @param consumer   the consumer to be called when
+     * @param filter    the filter that acts as prerequisites for the consumer to
+     *                   be called
+     * 
+     * @return {@code this}
+     */
+    public <T extends GenericEvent> SimpleCommand withEvent(Class<T> eventClass, Consumer<T> consumer,
+            @Nullable Predicate<? super T> filter) {
+        return withEvent(new GenericEventEntry<T>(eventClass, consumer, List.of(filter)));
     }
 
     @Override
@@ -104,7 +146,7 @@ public class SimpleCommand extends Command {
     public static class GenericEventEntry<T extends GenericEvent> {
         private Class<T> eventClass;
         private Consumer<? super T> consumer;
-        private List<? extends Function<? super T, Boolean>> filters;
+        private Collection<Predicate<? super T>> filters;
 
         /**
          * @param eventClass the class to be listened to
@@ -113,7 +155,7 @@ public class SimpleCommand extends Command {
          *                   be called
          */
         public GenericEventEntry(Class<T> eventClass, Consumer<? super T> consumer,
-                @Nullable List<? extends Function<? super T, Boolean>> filters) {
+                @Nullable Collection<Predicate<? super T>> filters) {
             requireNonNullParam(eventClass, "eventClass");
             requireNonNullParam(consumer, "consumer");
 
@@ -121,6 +163,23 @@ public class SimpleCommand extends Command {
             this.setConsumer(consumer);
             this.setFilters(filters);
         }
+
+        /**
+         * @param eventClass the class to be listened to
+         * @param consumer   the consumer to be called when
+         * @param filter    the filter that acts as prerequisites for the consumer to
+         *                   be called
+         */
+        public GenericEventEntry(Class<T> eventClass, Consumer<? super T> consumer,
+                @Nullable Predicate<? super T> filter) {
+            requireNonNullParam(eventClass, "eventClass");
+            requireNonNullParam(consumer, "consumer");
+
+            this.setEventClass(eventClass);
+            this.setConsumer(consumer);
+            this.setFilters(List.of(filter));
+        }
+
 
         /**
          * Calls the consumer if the {@code inputEvent} is the event to be listened to
@@ -134,7 +193,7 @@ public class SimpleCommand extends Command {
         public boolean notify(GenericEvent inputEvent) {
             if (!inputEvent.getClass().isAssignableFrom(eventClass))
                 return false;
-            if (filters != null && !filters.stream().allMatch(f -> f.apply((T) inputEvent)))
+            if (filters != null && !filters.stream().allMatch(f -> f.test((T) inputEvent)))
                 return false;
             invoke((T) inputEvent);
             return true;
@@ -185,18 +244,58 @@ public class SimpleCommand extends Command {
         /**
          * @return the list of filters
          */
-        public List<? extends Function<? super T, Boolean>> getFilters() {
+        public Collection<Predicate<? super T>> getFilters() {
             return filters;
         }
 
         /**
          * @param filters the list of filters
          */
-        public void setFilters(List<? extends Function<? super T, Boolean>> filters) {
+        public void setFilters(Collection<Predicate<? super T>> filters) {
             if (filters == null) {
-                filters = new ArrayList<Function<T, Boolean>>();
+                filters = new ArrayList<Predicate<? super T>>();
             }
             this.filters = filters;
         }
+
+        /**
+         * @param filter the filter to be added
+         */
+        public void addFilter(Predicate<? super T> filter) {
+            if (filters == null) {
+                filters = new ArrayList<Predicate<? super T>>();
+            }
+            this.filters.add(filter);
+        }
+    }
+
+    /**
+     * Filter types used by {@link #withMessageReceivedEvent(Consumer, Collection)}.
+     * 
+     * @see #getMessageReceivedEventFilters(MessageReceivedEventFilterTypes) getMessageReceivedEventFilters
+     */
+    public enum MessageReceivedEventFilterTypes {
+        kNotBot, kIsValid;
+    }
+
+    /**
+     * Gets filters for {@link #withMessageReceivedEvent(Consumer, Collection)}.
+     * 
+     * @param MessageReceivedEventFilterTypes the requested types of filters
+     */
+    public Set<Predicate<MessageReceivedEvent>> getMessageReceivedEventFilters(MessageReceivedEventFilterTypes... filterTypes) {
+        Set<Predicate<MessageReceivedEvent>> result = new HashSet<>(3);
+
+        for (MessageReceivedEventFilterTypes type : new HashSet<>(Arrays.asList(filterTypes))) {
+            switch (type) {
+                case kNotBot:
+                    result.add(event -> !event.getAuthor().isBot());
+                    break;
+                case kIsValid:
+                    result.add(event -> this.getInputValidity(event.getMessage().getContentDisplay()));
+                    break;
+            }
+        }
+        return result;
     }
 }
